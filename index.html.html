@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bamapad AI Events</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;font-family:'Segoe UI',Tahoma,Arial,sans-serif;color:#eaf6ff;overflow-x:hidden}
+  
+  body{
+    background: 
+      radial-gradient(1200px 600px at 10% 10%, rgba(0,255,255,0.08), transparent 60%),
+      radial-gradient(900px 500px at 90% 20%, rgba(255,165,0,0.06), transparent 60%),
+      radial-gradient(1000px 600px at 50% 90%, rgba(0,200,255,0.08), transparent 60%),
+      linear-gradient(135deg,#0a0e1a,#1a1f2e,#0f1624,#070b14);
+    background-attachment: fixed,fixed,fixed,fixed;
+    position: relative;
+  }
+
+  /* Background Bitcoin Chip Images */
+  .bg-layer{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  
+  .bg-img{
+    position:absolute;
+    opacity:0.12;
+    filter:blur(0.5px) saturate(110%) drop-shadow(0 0 8px rgba(255,165,0,0.3));
+    transition:transform 0.4s ease;
+    border-radius:8px;
+  }
+  
+  .bg1{
+    top:8%;
+    left:3%;
+    width:450px;
+    height:300px;
+    object-fit:cover;
+    transform:rotate(-5deg);
+  }
+  
+  .bg2{
+    bottom:12%;
+    right:5%;
+    width:420px;
+    height:320px;
+    object-fit:cover;
+    transform:rotate(3deg);
+  }
+  
+  .bg3{
+    top:40%;
+    left:60%;
+    width:380px;
+    height:280px;
+    object-fit:cover;
+    transform:rotate(-8deg);
+    opacity:0.08;
+  }
+
+  #app{
+    position:relative;
+    z-index:10;
+    max-width:1000px;
+    margin:0 auto;
+    padding:24px;
+    backdrop-filter:blur(2px);
+    background:rgba(5,10,20,0.15);
+    border-radius:20px;
+    margin-top:20px;
+    margin-bottom:80px;
+    box-shadow:0 0 30px rgba(0,255,255,0.1);
+  }
+  
+  header h1{
+    font-size:2.8rem;
+    text-align:center;
+    margin-bottom:18px;
+    font-weight:900;
+    text-shadow:0 0 20px rgba(0,255,255,0.8), 0 0 40px rgba(255,165,0,0.6);
+    background:linear-gradient(270deg, #00ffff,#ffa500,#ff6b35,#00ffff,#ff1493);
+    background-size:1400% 1400%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:glow 8s ease infinite;
+    letter-spacing:2px;
+  }
+  
+  @keyframes glow{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+  }
+
+  nav{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-bottom:25px;
+  }
+  
+  nav button{
+    border:none;
+    border-radius:12px;
+    padding:12px 20px;
+    font-weight:700;
+    cursor:pointer;
+    color:#051a33;
+    background:linear-gradient(45deg,#00e0ff,#0099ff);
+    box-shadow:0 0 15px rgba(0,224,255,.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    transition:all 0.3s ease;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-size:0.9rem;
+  }
+  
+  nav button:hover{
+    transform:translateY(-2px) scale(1.05);
+    box-shadow:0 5px 20px rgba(255,165,0,.5);
+    background:linear-gradient(45deg,#ffa500,#ff6b35);
+  }
+  
+  nav button.active{
+    background:linear-gradient(45deg,#ff1493,#ff6b35);
+    color:#fff;
+    box-shadow:0 0 20px rgba(255,20,147,.6);
+  }
+  
+  #loginBtn{
+    background:linear-gradient(45deg,#ff1493,#ff0066);
+    color:#fff;
+  }
+
+  section{
+    display:none;
+    opacity:0;
+    transition:opacity 0.4s ease;
+  }
+  
+  section.active{
+    display:block;
+    opacity:1;
+  }
+
+  form{
+    background:rgba(5,15,30,0.7);
+    backdrop-filter:blur(8px);
+    border-radius:16px;
+    padding:20px 24px;
+    box-shadow:0 0 20px rgba(0,255,255,.3), inset 0 1px 0 rgba(255,255,255,0.1);
+    margin-bottom:20px;
+    border:1px solid rgba(0,255,255,0.2);
+  }
+  
+  label{
+    display:block;
+    margin:12px 0 8px;
+    font-weight:700;
+    color:#00e0ff;
+    text-shadow:0 0 10px rgba(0,224,255,0.5);
+  }
+  
+  input,select,textarea{
+    width:100%;
+    padding:12px 16px;
+    border-radius:10px;
+    border:2px solid #00e0ff;
+    background:rgba(11,35,54,0.8);
+    color:#eaf6ff;
+    outline:none;
+    font-size:1rem;
+    backdrop-filter:blur(4px);
+    transition:all 0.3s ease;
+  }
+  
+  input:focus,select:focus,textarea:focus{
+    border-color:#ff1493;
+    box-shadow:0 0 15px rgba(255,20,147,0.4);
+    background:rgba(11,35,54,0.95);
+  }
+  
+  .row{
+    display:flex;
+    gap:12px;
+    align-items:end;
+  }
+  
+  .row>div{
+    flex:1;
+  }
+  
+  .btn{
+    margin-top:12px;
+    background:linear-gradient(45deg,#00e0ff,#00ffaa);
+    border:none;
+    border-radius:12px;
+    padding:14px 18px;
+    color:#02131e;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:0 0 20px rgba(0,255,200,.4);
+    transition:all 0.3s ease;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    font-size:0.95rem;
+  }
+  
+  .btn:hover{
+    transform:translateY(-2px);
+    background:linear-gradient(45deg,#ff1493,#ff6b35);
+    color:#fff;
+    box-shadow:0 5px 25px rgba(255,20,147,.6);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:18px;
+    margin-top:20px;
+  }
+  
+  .card{
+    background:rgba(6,26,46,0.8);
+    border-radius:16px;
+    border:2px solid transparent;
+    border-image:linear-gradient(45deg,#00e0ff,#ff1493,#ffa500) 1;
+    padding:18px;
+    box-shadow:0 0 15px rgba(0,255,255,.2);
+    backdrop-filter:blur(6px);
+    transition:all 0.3s ease;
+  }
+  
+  .card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 10px 30px rgba(255,20,147,.3);
+    border-image:linear-gradient(45deg,#ff1493,#ffa500,#00ffff) 1;
+  }
+  
+  .card h3{
+    margin-bottom:10px;
+    color:#00ffff;
+    text-shadow:0 0 10px rgba(0,255,255,0.6);
+  }
+  
+  .card img{
+    max-width:120px;
+    border-radius:10px;
+    margin-bottom:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.5);
+  }
+  
+  .chip{
+    display:inline-block;
+    background:rgba(10,45,74,0.8);
+    border:1px solid #00e0ff;
+    color:#bfefff;
+    padding:6px 12px;
+    border-radius:20px;
+    margin:4px 6px 0 0;
+    font-size:0.85rem;
+    font-weight:600;
+    box-shadow:0 0 10px rgba(0,224,255,0.3);
+  }
+  
+  .actions{
+    display:flex;
+    gap:10px;
+    margin-top:12px;
+    flex-wrap:wrap;
+  }
+  
+  .actions button{
+    flex:1;
+    min-width:100px;
+    padding:8px 12px;
+    font-size:0.8rem;
+  }
+  
+  .danger{
+    background:linear-gradient(45deg,#ff5b5b,#ff1a1a) !important;
+    color:#fff !important;
+  }
+  
+  .danger:hover{
+    background:linear-gradient(45deg,#ff1a1a,#cc0000) !important;
+  }
+  
+  .muted{
+    opacity:0.8;
+    font-size:0.9rem;
+  }
+
+  /* Modal */
+  .modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.8);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    backdrop-filter:blur(8px);
+  }
+  
+  .modal.active{
+    display:flex;
+  }
+  
+  .modal .box{
+    width:min(95vw,450px);
+    background:rgba(2,22,39,0.95);
+    border-radius:20px;
+    padding:24px;
+    border:2px solid #00e0ff;
+    box-shadow:0 0 30px rgba(255,20,147,.5);
+    backdrop-filter:blur(10px);
+  }
+
+  /* Support Button */
+  .support{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    background:linear-gradient(45deg,#00e0ff,#ff1493);
+    color:#fff;
+    font-weight:800;
+    padding:12px 18px;
+    border-radius:30px;
+    box-shadow:0 0 25px rgba(255,20,147,.7);
+    z-index:100;
+    cursor:pointer;
+    transition:all 0.3s ease;
+    font-size:1rem;
+    text-shadow:0 0 10px rgba(0,0,0,0.8);
+  }
+  
+  .support:hover{
+    transform:scale(1.1);
+    box-shadow:0 0 35px rgba(255,20,147,.9);
+  }
+
+  /* Success/Error Messages */
+  .success{
+    background:rgba(0,255,0,0.1);
+    border:1px solid #00ff00;
+    color:#00ff88;
+    padding:10px;
+    border-radius:8px;
+    margin-top:10px;
+  }
+  
+  .error{
+    background:rgba(255,0,0,0.1);
+    border:1px solid #ff0000;
+    color:#ff5555;
+    padding:10px;
+    border-radius:8px;
+    margin-top:10px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .row {
+      flex-direction: column;
+      gap: 0;
+    }
+    
+    nav {
+      gap: 8px;
+    }
+    
+    nav button {
+      padding: 10px 14px;
+      font-size: 0.8rem;
+    }
+    
+    header h1 {
+      font-size: 2.2rem;
+    }
+  }
+</style>
+</head>
+<body>
+  <!-- Background Bitcoin Circuit Board Images -->
+  <div class="bg-layer">
+    <img class="bg-img bg1" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMGEwZTE5Ii8+CjxwYXRoIGQ9Ik0yMDAgMTUwbTAtNTBhNTAgNTAgMCAwIDEgMTAwIDB2MTAwYTUwIDUwIDAgMCAxLTEwMCAweiIgZmlsbD0iI2ZmYTUwMCIgb3BhY2l0eT0iMC44Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTYwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMzAiIGZpbGw9IiNmZmE1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkI8L3RleHQ+CjwvcGVnPgo=" alt="Bitcoin Background 1">
+    <img class="bg-img bg2" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMGEwZTE5Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmYTUwMCIgc3Ryb2tlLXdpZHRoPSIzIiBvcGFjaXR5PSIwLjYiLz4KPHR0ZXh0IHg9IjIwMCIgeT0iMTYwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNmZmE1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkNSWVBUTzwvdGV4dD4KPC9zdmc+" alt="Bitcoin Background 2">
+    <img class="bg-img bg3" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMGEwZTE5Ii8+CjxwYXRoIGQ9Ik0xMDAgMTAwaDIwMHYxMDBIMTAwVjEwMHoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmYTUwMCIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjUiLz4KPHR0ZXh0IHg9IjIwMCIgeT0iMTYwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiNmZmE1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkJMT0NLPC90ZXh0Pgo8L3N2Zz4=" alt="Bitcoin Background 3">
+  </div>
+
+  <div id="app">
+    <header><h1>Bamapad AI Events</h1></header>
+    <nav>
+      <button id="navCreate" class="active">Create Event</button>
+      <button id="navView">View Events</button>
+      <button id="navCompleted">Completed Sessions</button>
+      <button id="loginBtn">Login</button>
+    </nav>
+
+    <!-- Create Event Section -->
+    <section id="secCreate" class="active">
+      <form id="adminForm">
+        <label for="adminPass">Admin Password</label>
+        <input type="password" id="adminPass" placeholder="Enter password: bamapad" required>
+        <button class="btn" type="submit">Admin Login</button>
+        <div id="adminMsg" class="muted" style="margin-top:10px"></div>
+      </form>
+
+      <form id="createForm" style="display:none">
+        <div class="row">
+          <div>
+            <label for="evName">Event Name</label>
+            <input id="evName" type="text" placeholder="e.g. Bitcoin Trading Workshop" required>
+          </div>
+          <div>
+            <label for="evTime">Default Time (optional)</label>
+            <input id="evTime" type="time">
+          </div>
+        </div>
+        <label for="evDescription">Event Description</label>
+        <textarea id="evDescription" placeholder="Describe your event..." rows="3"></textarea>
+        <label for="evImage">Upload Event Image</label>
+        <input id="evImage" type="file" accept="image/*" required>
+        <img id="evPreview" style="display:none;max-width:140px;border-radius:12px;margin-top:10px;box-shadow:0 0 15px rgba(0,255,255,0.5)"/>
+        <button class="btn" type="submit">Create Event</button>
+      </form>
+
+      <div id="createdList" class="grid"></div>
+    </section>
+
+    <!-- View Events Section -->
+    <section id="secView">
+      <h2 style="text-align:center;margin-bottom:20px;color:#00ffff;text-shadow:0 0 15px rgba(0,255,255,0.8)">Active Events</h2>
+      <div id="viewList" class="grid"></div>
+    </section>
+
+    <!-- Completed Sessions Section -->
+    <section id="secCompleted">
+      <h2 style="text-align:center;margin-bottom:20px;color:#ffa500;text-shadow:0 0 15px rgba(255,165,0,0.8)">Completed Sessions</h2>
+      <div id="completedList" class="grid"></div>
+    </section>
+  </div>
+
+  <!-- Join Event Modal -->
+  <div id="joinModal" class="modal">
+    <div class="box">
+      <h3 style="margin-bottom:15px;color:#00ffff;text-shadow:0 0 10px rgba(0,255,255,0.8);text-align:center">Join Event</h3>
+      <form id="joinForm">
+        <label for="joinName">Your Name</label>
+        <input id="joinName" type="text" placeholder="Enter your full name" required>
+        <label for="joinTime">Preferred Timing</label>
+        <input id="joinTime" type="time" required>
+        <div style="display:flex;gap:10px;margin-top:15px">
+          <button class="btn" type="submit" style="flex:1">Confirm Join</button>
+          <button class="btn danger" type="button" id="joinClose" style="flex:1">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Support Button -->
+  <div class="support" onclick="alert('Support Contact: 919798330489\\nCall or WhatsApp for assistance!')">
+    📞 Support: 919798330489
+  </div>
+
+<script>
+// Application State
+let isLogged = false;
+let isAdmin = false; 
+let events = []; // {id, name, time, description, image, registrations:[], status:'created'|'completed'|'cancelled'}
+let completed = [];
+let currentJoinEvent = null;
+
+// DOM Elements
+const navCreate = document.getElementById('navCreate');
+const navView = document.getElementById('navView');
+const navCompleted = document.getElementById('navCompleted');
+const loginBtn = document.getElementById('loginBtn');
+const secCreate = document.getElementById('secCreate');
+const secView = document.getElementById('secView');
+const secCompleted = document.getElementById('secCompleted');
+const adminForm = document.getElementById('adminForm');
+const adminPass = document.getElementById('adminPass');
+const adminMsg = document.getElementById('adminMsg');
+const createForm = document.getElementById('createForm');
+const createdList = document.getElementById('createdList');
+const evImage = document.getElementById('evImage');
+const evPreview = document.getElementById('evPreview');
+const viewList = document.getElementById('viewList');
+const completedList = document.getElementById('completedList');
+const joinModal = document.getElementById('joinModal');
+const joinForm = document.getElementById('joinForm');
+const joinClose = document.getElementById('joinClose');
+const joinName = document.getElementById('joinName');
+const joinTime = document.getElementById('joinTime');
+
+// Navigation Functions
+function setActive(section) {
+  [navCreate, navView, navCompleted].forEach(b => b.classList.remove('active'));
+  [secCreate, secView, secCompleted].forEach(s => s.classList.remove('active'));
+  
+  if(section === 'create') {
+    navCreate.classList.add('active');
+    secCreate.classList.add('active');
+  }
+  if(section === 'view') {
+    navView.classList.add('active');
+    secView.classList.add('active');
+  }
+  if(section === 'completed') {
+    navCompleted.classList.add('active');
+    secCompleted.classList.add('active');
+  }
+}
+
+// Event Listeners
+navCreate.onclick = () => setActive('create');
+navView.onclick = () => {
+  setActive('view');
+  renderView();
+};
+navCompleted.onclick = () => {
+  setActive('completed');
+  renderCompleted();
+};
+
+// Login/Logout Toggle
+loginBtn.onclick = () => {
+  isLogged = !isLogged;
+  loginBtn.textContent = isLogged ? 'Logout' : 'Login';
+  
+  if (!isLogged) {
+    isAdmin = false;
+    adminMsg.innerHTML = '';
+    createForm.style.display = 'none';
+    adminForm.style.display = 'block';
+  }
+};
+
+// Admin Login
+adminForm.onsubmit = (e) => {
+  e.preventDefault();
+  if (adminPass.value === 'bamapad') {
+    isAdmin = true;
+    adminMsg.innerHTML = '<div class="success">✅ Admin access granted!</div>';
+    adminForm.style.display = 'none';
+    createForm.style.display = 'block';
+    adminPass.value = '';
+    renderCreated();
+  } else {
+    adminMsg.innerHTML = '<div class="error">❌ Incorrect password!</div>';
+    adminPass.value = '';
+  }
+};
+
+// Image Preview
+evImage.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    evPreview.src = ev.target.result;
+    evPreview.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+});
+
+// Create Event
+createForm.onsubmit = (e) => {
+  e.preventDefault();
+  
+  if (!isAdmin) {
+    alert('⚠️ Admin access required!');
+    return;
+  }
+  
+  const name = document.getElementById('evName').value.trim();
+  const time = document.getElementById('evTime').value;
+  const description = document.getElementById('evDescription').value.trim();
+  
+  if (!name || !evPreview.src) {
+    alert('⚠️ Please fill event name and upload image!');
+    return;
+  }
+  
+  const id = Date.now().toString(36);
+  const newEvent = {
+    id,
+    name,
+    time,
+    description,
+    image: evPreview.src,
+    registrations: [],
+    status: 'created',
+    createdAt: new Date()
+  };
+  
+  events.push(newEvent);
+  createForm.reset();
+  evPreview.style.display = 'none';
+  renderCreated();
+  
+  // Success notification
+  const successDiv = document.createElement('div');
+  successDiv.className = 'success';
+  successDiv.innerHTML = '🎉 Event created successfully!';
+  adminMsg.innerHTML = '';
+  adminMsg.appendChild(successDiv);
+  
+  setTimeout(() => {
+    adminMsg.innerHTML = '';
+  }, 3000);
+};
+
+// Render Created Events (Admin View)
+function renderCreated() {
+  createdList.innerHTML = '';
+  
+  if (events.length === 0) {
+    createdList.innerHTML = '<p class="muted" style="text-align:center;padding:40px;">No events created yet. Create your first event above! 🚀</p>';
+    return;
+  }
+  
+  events.filter(e => e.status === 'created').forEach(ev => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <img src="${ev.image}" alt="${ev.name}" style="width:100%;max-width:140px;border-radius:12px;margin-bottom:12px;">
+      <h3>${ev.name}</h3>
+      <p class="muted">${ev.description || 'No description'}</p>
+      <div class="muted" style="margin:8px 0;">Default time: ${ev.time || 'Not set'}</div>
+      <div style="margin:10px 0;">
+        <span class="chip">👥 ${ev.registrations.length} Registered</span>
+        <span class="chip">📅 ${ev.createdAt.toLocaleDateString()}</span>
+      </div>
+      <div class="actions">
+        <button class="btn" data-act="join" data-id="${ev.id}">Join Event</button>
+        <button class="btn" data-act="complete" data-id="${ev.id}" style="background:linear-gradient(45deg,#00ff88,#00cc66)">✅ Complete</button>
+        <button class="btn danger" data-act="cancel" data-id="${ev.id}">❌ Cancel</button>
+      </div>
+    `;
+    
+    card.querySelectorAll('button').forEach(btn => btn.onclick = handleAction);
+    createdList.appendChild(card);
+  });
+}
+
+// Handle Actions (Join, Complete, Cancel)
+function handleAction(e) {
+  const id = e.target.getAttribute('data-id');
+  const action = e.target.getAttribute('data-act');
+  const event = events.find(x => x.id === id);
+  
+  if (!event) return;
+  
+  if (action === 'join') {
+    openJoin(event);
+  }
+  
+  if (action === 'complete') {
+    if (!isAdmin) {
+      alert('⚠️ Admin access required!');
+      return;
+    }
+    
+    if (confirm(`✅ Mark "${event.name}" as completed?`)) {
+      event.status = 'completed';
+      event.completedAt = new Date();
+      completed.push({...event});
+      renderCreated();
+      alert('🎉 Event marked as completed!');
+    }
+  }
+  
+  if (action === 'cancel') {
+    if (!isAdmin) {
+      alert('⚠️ Admin access required!');
+      return;
+    }
+    
+    if (confirm(`❌ Cancel "${event.name}"? This action cannot be undone.`)) {
+      event.status = 'cancelled';
+      renderCreated();
+      alert('🚫 Event cancelled successfully!');
+    }
+  }
+}
+
+// Open Join Modal
+function openJoin(event) {
+  currentJoinEvent = event;
+  joinName.value = '';
+  joinTime.value = event.time || '';
+  joinModal.classList.add('active');
+}
+
+// Close Join Modal
+joinClose.onclick = () => {
+  joinModal.classList.remove('active');
+};
+
+// Join Event Form
+joinForm.onsubmit = (e) => {
+  e.preventDefault();
+  
+  if (!currentJoinEvent) return;
+  
+  const name = joinName.value.trim();
+  const time = joinTime.value;
+  
+  if (!name || !time) {
+    alert('⚠️ Please fill all fields!');
+    return;
+  }
+  
+  // Check if already registered
+  const alreadyRegistered = currentJoinEvent.registrations.some(r => 
+    r.name.toLowerCase() === name.toLowerCase()
+  );
+  
+  if (alreadyRegistered) {
+    alert('⚠️ You are already registered for this event!');
+    return;
+  }
+  
+  currentJoinEvent.registrations.push({
+    name,
+    time,
+    registeredAt: new Date()
+  });
+  
+  joinModal.classList.remove('active');
+  renderCreated();
+  renderView();
+  
+  alert(`🎉 Successfully registered for "${currentJoinEvent.name}" at ${time}!`);
+};
+
+// Render View Events (Public View)
+function renderView() {
+  viewList.innerHTML = '';
+  
+  const activeEvents = events.filter(e => e.status === 'created');
+  
+  if (activeEvents.length === 0) {
+    viewList.innerHTML = '<p class="muted" style="text-align:center;padding:40px;">No active events available. Check back later! 🔄</p>';
+    return;
+  }
+  
+  activeEvents.forEach(ev => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    
+    const registrationsList = ev.registrations.length > 0 
+      ? ev.registrations.map(r => `<span class="chip">${r.name} • ${r.time}</span>`).join('')
+      : '<span class="muted">No registrations yet</span>';
+    
+    card.innerHTML = `
+      <img src="${ev.image}" alt="${ev.name}" style="width:100%;max-width:140px;border-radius:12px;margin-bottom:12px;">
+      <h3>${ev.name}</h3>
+      <p class="muted">${ev.description || 'No description'}</p>
+      <div class="muted" style="margin:8px 0;">Default time: ${ev.time || 'Not set'}</div>
+      <div style="margin:12px 0;">
+        <strong style="color:#00ffff;">Registered Participants:</strong><br>
+        <div style="margin-top:8px;">${registrationsList}</div>
+      </div>
+      <div class="actions">
+        <button class="btn" data-act="join" data-id="${ev.id}">🎯 Join Event</button>
+      </div>
+    `;
+    
+    card.querySelector('button').onclick = handleAction;
+    viewList.appendChild(card);
+  });
+}
+
+// Render Completed Sessions
+function renderCompleted() {
+  completedList.innerHTML = '';
+  
+  const allCompleted = [
+    ...completed,
+    ...events.filter(e => e.status === 'completed')
+  ];
+  
+  if (allCompleted.length === 0) {
+    completedList.innerHTML = '<p class="muted" style="text-align:center;padding:40px;">No completed sessions yet. 📋</p>';
+    return;
+  }
+  
+  allCompleted.forEach(ev => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.opacity = '0.9';
+    card.style.borderImage = 'linear-gradient(45deg,#ffa500,#ff6b35,#00ff88) 1';
+    
+    const completedTime = ev.completedAt ? 
+      new Date(ev.completedAt).toLocaleString() : 
+      'Recently completed';
+    
+    card.innerHTML = `
+      <img src="${ev.image}" alt="${ev.name}" style="width:100%;max-width:140px;border-radius:12px;margin-bottom:12px;">
+      <h3>${ev.name} <span style="color:#00ff88;">✅</span></h3>
+      <p class="muted">${ev.description || 'No description'}</p>
+      <div class="muted" style="margin:8px 0;">Completed: ${completedTime}</div>
+      <div style="margin:10px 0;">
+        <span class="chip" style="background:rgba(0,255,136,0.2);border-color:#00ff88;">
+          👥 ${ev.registrations ? ev.registrations.length : 0} Total Participants
+        </span>
+      </div>
+    `;
+    
+    completedList.appendChild(card);
+  });
+}
+
+// Parallax Background Effect
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY;
+  document.querySelectorAll('.bg-img').forEach((el, i) => {
+    const speed = 0.1 + (i * 0.05);
+    el.style.transform += ` translateY(${scrollY * speed}px)`;
+  });
+});
+
+// Initialize Application
+function init() {
+  setActive('create');
+  renderCreated();
+  
+  // Add some sample data for demonstration
+  if (events.length === 0 && isAdmin) {
+    // You can add sample events here for testing
+  }
+}
+
+// Start the application
+init();
+</script>
+</body>
+</html>
